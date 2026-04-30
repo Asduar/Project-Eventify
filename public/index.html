@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Eventify - Dashboard</title>
+    <link href='https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css' rel='stylesheet' />
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            display: flex;
+            height: 100vh;
+            background-color: #f4f6f9;
+            overflow: hidden;
+        }
+
+        /* --- SIDEBAR KIRI --- */
+        .sidebar {
+            width: 250px;
+            background-color: #2c3e50;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            padding-top: 20px;
+        }
+        .sidebar h2 {
+            text-align: center;
+            margin-bottom: 30px;
+            letter-spacing: 2px;
+        }
+        .nav-btn {
+            background: none;
+            border: none;
+            color: #bdc3c7;
+            padding: 15px 20px;
+            text-align: left;
+            font-size: 16px;
+            cursor: pointer;
+            transition: 0.3s;
+            border-left: 4px solid transparent;
+        }
+        .nav-btn:hover, .nav-btn.active {
+            background-color: #34495e;
+            color: white;
+            border-left: 4px solid #3498db;
+        }
+        .logout-btn {
+            margin-top: auto;
+            background-color: #e74c3c;
+            color: white;
+            border: none;
+            padding: 15px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .logout-btn:hover { background-color: #c0392b; }
+
+        /* --- KONTEN UTAMA KANAN --- */
+        .main-content {
+            flex: 1;
+            padding: 30px;
+            overflow-y: auto;
+        }
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #ddd;
+            padding-bottom: 10px;
+        }
+        
+        /* --- MANAJEMEN SECTION (TABS) --- */
+        .content-section { display: none; }
+        .content-section.active { display: block; }
+
+        /* --- GAYA ELEMEN DALAM KONTEN --- */
+        .card {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            margin-bottom: 20px;
+        }
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; margin-bottom: 5px; font-weight: bold; font-size: 14px;}
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box;
+        }
+        .btn-submit {
+            background-color: #3498db; color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; font-weight: bold;
+        }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        table, th, td { border: 1px solid #ddd; }
+        th, td { padding: 10px; text-align: left; font-size: 14px;}
+        th { background-color: #f2f2f2; }
+    </style>
+</head>
+<body>
+
+    <div class="sidebar">
+        <h2>EVENTIFY</h2>
+        <button class="nav-btn active" onclick="switchTab('dashboard')">Kalender Acara</button>
+        <button class="nav-btn" onclick="switchTab('organization')">Organisasi</button>
+        <button class="nav-btn" onclick="switchTab('room')">Ruangan</button>
+        <button class="nav-btn" onclick="switchTab('attendee')">Peserta</button>
+        <button class="logout-btn" id="btnLogout">Logout</button>
+    </div>
+
+    <div class="main-content">
+        <div class="header-top">
+            <h1 id="pageTitle">Kalender Acara</h1>
+            <div>Halo, <span id="displayUsername" style="font-weight: bold; color: #3498db;">Pengguna</span>!</div>
+        </div>
+
+        <div id="dashboard" class="content-section active">
+            <div class="card" style="display: flex; gap: 10px;">
+                <form id="addEventForm" style="flex: 1; display: flex; flex-wrap: wrap; gap: 10px;">
+                    <input type="hidden" id="eventId"> 
+                    <div class="form-group" style="width: 30%;"><label>Judul</label><input type="text" id="title" required></div>
+                    <div class="form-group" style="width: 20%;"><label>Tanggal</label><input type="date" id="date" required></div>
+                    <div class="form-group" style="width: 15%;"><label>Jam</label><input type="time" id="time" required></div>
+                    <div class="form-group" style="width: 25%;"><label>Tipe</label>
+                        <select id="type" required><option value="Rapat">Rapat</option><option value="Konser">Konser</option><option value="Seminar">Seminar</option><option value="Lainnya">Lainnya</option></select>
+                    </div>
+                    <div class="form-group" style="width: 100%;"><label>Lokasi</label><input type="text" id="location" required></div>
+                    <div class="form-group" style="width: 100%;"><label>Deskripsi</label><textarea id="description" rows="2"></textarea></div>
+                    <button type="submit" class="btn-submit" style="width: 100%;">Simpan Jadwal</button>
+                </form>
+            </div>
+            <div class="card"><div id='calendar'></div></div>
+        </div>
+
+        <div id="organization" class="content-section">
+            <div class="card">
+                <h3>Tambah Organisasi</h3>
+                <form id="orgForm" style="display: flex; gap: 10px; align-items: flex-end;">
+                    <div class="form-group" style="flex: 1;"><label>Nama</label><input type="text" id="orgName" required></div>
+                    <div class="form-group" style="flex: 1;"><label>Email Kontak</label><input type="email" id="orgEmail" required></div>
+                    <div class="form-group" style="flex: 2;"><label>Deskripsi</label><input type="text" id="orgDesc"></div>
+                    <div class="form-group"><button type="submit" class="btn-submit">Tambah</button></div>
+                </form>
+            </div>
+            <div class="card">
+                <h3>Daftar Organisasi</h3>
+                <table>
+                    <thead><tr><th>No</th><th>Nama</th><th>Email</th><th>Deskripsi</th></tr></thead>
+                    <tbody id="orgTableBody"><tr><td colspan="4" style="text-align: center;">Memuat...</td></tr></tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="room" class="content-section">
+            <div class="card">
+                <h3>Tambah Ruangan Baru</h3>
+                <form id="roomForm" style="display: flex; gap: 10px; align-items: flex-end;">
+                    <div class="form-group" style="flex: 2;"><label>Nama Ruangan</label><input type="text" id="roomName" required placeholder="Contoh: Aula lt.5"></div>
+                    <div class="form-group" style="flex: 1;"><label>Gedung</label><input type="text" id="roomBuilding" required placeholder="Contoh: Gedung B"></div>
+                    <div class="form-group" style="flex: 1;"><label>Kapasitas (Orang)</label><input type="number" id="roomCapacity" required></div>
+                    <div class="form-group"><button type="submit" class="btn-submit">Tambah</button></div>
+                </form>
+            </div>
+            <div class="card">
+                <h3>Daftar Ruangan</h3>
+                <table>
+                    <thead><tr><th>No</th><th>Nama Ruangan</th><th>Gedung</th><th>Kapasitas</th></tr></thead>
+                    <tbody id="roomTableBody"><tr><td colspan="4" style="text-align: center;">Memuat...</td></tr></tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="attendee" class="content-section">
+            <div class="card">
+                <h3>Daftarkan Peserta Event</h3>
+                <form id="attendeeForm" style="display: flex; gap: 10px; align-items: flex-end;">
+                    <div class="form-group" style="flex: 2;"><label>Nama Mahasiswa</label><input type="text" id="attName" required></div>
+                    <div class="form-group" style="flex: 1;"><label>NIM</label><input type="text" id="attNim" required></div>
+                    <div class="form-group" style="flex: 1;"><label>ID Acara (Event)</label><input type="number" id="attEventId" required placeholder="Contoh: 1"></div>
+                    <div class="form-group"><button type="submit" class="btn-submit">Daftar</button></div>
+                </form>
+            </div>
+            <div class="card">
+                <h3>Daftar Peserta</h3>
+                <table>
+                    <thead><tr><th>No</th><th>Nama</th><th>NIM</th><th>ID Acara</th></tr></thead>
+                    <tbody id="attendeeTableBody"><tr><td colspan="4" style="text-align: center;">Memuat...</td></tr></tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+
+    <div id="modalOverlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:999;"></div>
+    <div id="eventModal" style="display:none; position:fixed; top:50%; left:50%; transform:translate(-50%, -50%); background:white; padding:25px; border-radius:8px; width:320px; z-index:1000;">
+        <h2 id="modalTitle" style="margin-top:0;">Judul</h2>
+        <p><strong>🕒 Jam:</strong> <span id="modalTime"></span></p>
+        <p><strong>📍 Lokasi:</strong> <span id="modalLocation"></span></p>
+        <p><strong>📝 Detail:</strong> <span id="modalDescription"></span></p>
+        <div style="display:flex; gap:10px; margin-top:20px;">
+            <button id="btnEdit" style="background:#f39c12; color:white; border:none; padding:10px; border-radius:4px; flex:1; cursor:pointer;">Edit</button>
+            <button id="btnDelete" style="background:#e74c3c; color:white; border:none; padding:10px; border-radius:4px; flex:1; cursor:pointer;">Hapus</button>
+            <button id="btnClose" style="background:#bdc3c7; border:none; padding:10px; border-radius:4px; flex:1; cursor:pointer;">Tutup</button>
+        </div>
+    </div>
+
+    <script src='https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js'></script>
+    <script type="module" src="/js/main.js"></script>
+</body>
+</html>
