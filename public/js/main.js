@@ -20,7 +20,8 @@ window.switchTab = function(sectionId) {
         'dashboard': 'Kalender Acara',
         'organization': 'Daftar Organisasi Kampus',
         'room': 'Manajemen Ruangan',
-        'attendee': 'Daftar Peserta Event'
+        'attendee': 'Daftar Peserta Event',
+        'profile': 'Profil Saya'
     };
     document.getElementById('pageTitle').innerText = titles[sectionId];
 
@@ -31,6 +32,7 @@ window.switchTab = function(sectionId) {
     if (sectionId === 'organization') fetchOrganizations();
     if (sectionId === 'room') fetchRooms();
     if (sectionId === 'attendee') fetchAttendees();
+    if (sectionId === 'profile') loadProfileData();
 };
 
 async function fetchEvents() {
@@ -189,4 +191,54 @@ document.getElementById('attendeeForm').addEventListener('submit', async functio
     });
     document.getElementById('attendeeForm').reset();
     fetchAttendees();
+});
+
+function loadProfileData() {
+    const user = JSON.parse(localStorage.getItem('eventify_user'));
+    document.getElementById('profId').value = user.id;
+    document.getElementById('profUsername').value = user.username;
+    document.getElementById('profEmail').value = user.email;
+    document.getElementById('profPassword').value = ''; 
+}
+
+document.getElementById('profileForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    const id = document.getElementById('profId').value;
+    const payload = {
+        username: document.getElementById('profUsername').value,
+        email: document.getElementById('profEmail').value
+    };
+
+    const newPassword = document.getElementById('profPassword').value;
+    if (newPassword.trim() !== '') {
+        payload.password = newPassword;
+    }
+
+    try {
+        const response = await fetch(`/users/${id}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+
+        if (response.ok) {
+            alert('Profil berhasil diperbarui!');
+            
+            const currentUser = JSON.parse(localStorage.getItem('eventify_user'));
+            currentUser.username = payload.username;
+            currentUser.email = payload.email;
+            localStorage.setItem('eventify_user', JSON.stringify(currentUser));
+            
+            document.getElementById('displayUsername').innerText = payload.username;
+            
+            document.getElementById('profPassword').value = ''; 
+        } else {
+            const errorData = await response.json();
+            alert(`Gagal memperbarui profil: ${errorData.message}`);
+        }
+    } catch (error) {
+        console.error(error);
+        alert('Terjadi kesalahan pada server.');
+    }
 });

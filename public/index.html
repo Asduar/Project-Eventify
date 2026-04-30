@@ -101,6 +101,7 @@
         <button class="nav-btn" onclick="switchTab('organization')">Organisasi</button>
         <button class="nav-btn" onclick="switchTab('room')">Ruangan</button>
         <button class="nav-btn" onclick="switchTab('attendee')">Peserta</button>
+        <button class="nav-btn" onclick="switchTab('profile')">Profil Saya</button>
         <button class="logout-btn" id="btnLogout">Logout</button>
     </div>
 
@@ -182,6 +183,28 @@
                     <thead><tr><th>No</th><th>Nama</th><th>NIM</th><th>ID Acara</th></tr></thead>
                     <tbody id="attendeeTableBody"><tr><td colspan="4" style="text-align: center;">Memuat...</td></tr></tbody>
                 </table>
+            </div>
+        </div>
+
+        <div id="profile" class="content-section">
+            <div class="card" style="max-width: 500px;">
+                <h3>Pengaturan Akun</h3>
+                <form id="profileForm">
+                    <input type="hidden" id="profId">
+                    <div class="form-group">
+                        <label>Nama Pengguna / Organisasi</label>
+                        <input type="text" id="profUsername" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Email</label>
+                        <input type="email" id="profEmail" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Password Baru</label>
+                        <input type="password" id="profPassword" placeholder="Kosongkan jika tidak ingin ganti password">
+                    </div>
+                    <button type="submit" class="btn-submit" style="width: 100%;">Simpan Perubahan</button>
+                </form>
             </div>
         </div>
 

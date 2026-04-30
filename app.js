@@ -28,7 +28,7 @@ const initializeApp = async () => {
     try {
         await db.authenticate();
         console.log('Koneksi ke MySQL Workbench berhasil!');
-        await db.sync({ alter: true }); 
+        await db.sync({ force: true }); 
         console.log('Tabel database berhasil disinkronisasi.');
 
         app.get('/', (req, res) => {
