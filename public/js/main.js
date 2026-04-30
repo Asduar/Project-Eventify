@@ -1,4 +1,3 @@
-// --- 0. PROTEKSI LOGIN & UI DASAR ---
 const userData = localStorage.getItem('eventify_user');
 if (!userData) window.location.href = '/login.html';
 else document.getElementById('displayUsername').innerText = JSON.parse(userData).username;
@@ -8,20 +7,15 @@ document.getElementById('btnLogout').addEventListener('click', () => {
     window.location.href = '/login.html';
 });
 
-// --- FUNGSI NAVIGASI DASHBOARD SPA ---
-let calendarInstance = null; // Menyimpan instance kalender
+let calendarInstance = null;
 
 window.switchTab = function(sectionId) {
-    // 1. Sembunyikan semua section
     document.querySelectorAll('.content-section').forEach(sec => sec.classList.remove('active'));
-    // 2. Hilangkan status aktif dari semua tombol sidebar
     document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
     
-    // 3. Tampilkan section yang dipilih
     document.getElementById(sectionId).classList.add('active');
-    event.currentTarget.classList.add('active'); // Tombol yang diklik jadi aktif
+    event.currentTarget.classList.add('active');
 
-    // 4. Ubah Judul Halaman
     const titles = {
         'dashboard': 'Kalender Acara',
         'organization': 'Daftar Organisasi Kampus',
@@ -30,21 +24,15 @@ window.switchTab = function(sectionId) {
     };
     document.getElementById('pageTitle').innerText = titles[sectionId];
 
-    // FIX FULLCALENDAR BUG: Render ulang kalender jika tab kalender dibuka
     if (sectionId === 'dashboard' && calendarInstance) {
         setTimeout(() => calendarInstance.updateSize(), 100);
     }
     
-    // Ambil data jika tab spesifik dibuka
     if (sectionId === 'organization') fetchOrganizations();
-    // Ambil data jika tab spesifik dibuka
-    if (sectionId === 'room') fetchRooms();         // Tambahkan baris ini
-    if (sectionId === 'attendee') fetchAttendees(); // Tambahkan baris ini
+    if (sectionId === 'room') fetchRooms();
+    if (sectionId === 'attendee') fetchAttendees();
 };
 
-// =========================================================
-// 1. LOGIKA KALENDER (EVENT)
-// =========================================================
 async function fetchEvents() {
     try {
         const res = await fetch('/events');
@@ -80,7 +68,6 @@ document.addEventListener('DOMContentLoaded', async function() {
     calendarInstance.render();
 });
 
-// Modal Logic Kalender
 const closeModal = () => { document.getElementById('modalOverlay').style.display = 'none'; document.getElementById('eventModal').style.display = 'none'; };
 document.getElementById('btnClose').addEventListener('click', closeModal);
 document.getElementById('modalOverlay').addEventListener('click', closeModal);
@@ -120,9 +107,6 @@ document.getElementById('addEventForm').addEventListener('submit', async functio
 });
 
 
-// =========================================================
-// 2. LOGIKA ORGANISASI
-// =========================================================
 async function fetchOrganizations() {
     try {
         const res = await fetch('/organizations');
@@ -148,12 +132,9 @@ document.getElementById('orgForm').addEventListener('submit', async function(e) 
         method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload)
     });
     document.getElementById('orgForm').reset();
-    fetchOrganizations(); // Refresh tabel langsung
+    fetchOrganizations();
 });
 
-// =========================================================
-// 3. LOGIKA RUANGAN
-// =========================================================
 async function fetchRooms() {
     try {
         const res = await fetch('/rooms');
@@ -179,12 +160,9 @@ document.getElementById('roomForm').addEventListener('submit', async function(e)
         method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload)
     });
     document.getElementById('roomForm').reset();
-    fetchRooms(); // Refresh tabel langsung
+    fetchRooms();
 });
 
-// =========================================================
-// 4. LOGIKA PESERTA (ATTENDEE)
-// =========================================================
 async function fetchAttendees() {
     try {
         const res = await fetch('/attendees');
@@ -210,5 +188,5 @@ document.getElementById('attendeeForm').addEventListener('submit', async functio
         method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload)
     });
     document.getElementById('attendeeForm').reset();
-    fetchAttendees(); // Refresh tabel langsung
+    fetchAttendees();
 });

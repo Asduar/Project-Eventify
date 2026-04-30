@@ -1,6 +1,5 @@
 import Event from '../models/Event.js';
 
-// 1. READ: Mendapatkan semua jadwal event
 export const getAllEvents = async (req, res) => {
     try {
         const events = await Event.findAll();
@@ -10,7 +9,6 @@ export const getAllEvents = async (req, res) => {
     }
 };
 
-// 2. READ: Mendapatkan satu event berdasarkan ID
 export const getEventById = async (req, res) => {
     try {
         const event = await Event.findByPk(req.params.id);
@@ -21,7 +19,6 @@ export const getEventById = async (req, res) => {
     }
 };
 
-// 3. CREATE: Membuat jadwal event baru
 export const createEvent = async (req, res) => {
     try {
         const newEvent = await Event.create(req.body);
@@ -31,7 +28,6 @@ export const createEvent = async (req, res) => {
     }
 };
 
-// 4. UPDATE: Mengubah data event yang sudah ada
 export const updateEvent = async (req, res) => {
     try {
         const updated = await Event.update(req.body, {
@@ -44,7 +40,6 @@ export const updateEvent = async (req, res) => {
     }
 };
 
-// 5. DELETE: Menghapus jadwal event
 export const deleteEvent = async (req, res) => {
     try {
         const deleted = await Event.destroy({

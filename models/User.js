@@ -1,7 +1,6 @@
 import { DataTypes, Model } from 'sequelize';
 import db from '../config/database.js';
 
-// Memenuhi syarat M02: Class dan Inheritance
 class User extends Model {}
 
 User.init({
@@ -27,7 +26,7 @@ User.init({
     sequelize: db,
     modelName: 'User',
     tableName: 'users',
-    timestamps: true // Otomatis membuat kolom createdAt & updatedAt
+    timestamps: true
 });
 
 export default User;

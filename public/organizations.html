@@ -32,7 +32,6 @@
         }
         .btn-back:hover { background-color: #a6acb0; }
         
-        /* Desain Form Simpel */
         .card {
             background: #fff;
             padding: 20px;
@@ -67,7 +66,6 @@
         }
         .btn-submit:hover { background-color: #2c6fb0; }
 
-        /* Desain List/Tabel Simpel */
         table {
             width: 100%;
             border-collapse: collapse;
@@ -131,26 +129,22 @@
     </div>
 
     <script>
-        // --- 1. Proteksi Halaman (Cek Login) ---
         if (!localStorage.getItem('eventify_user')) {
             window.location.href = '/login.html';
         }
 
-        // --- 2. READ: Mengambil Data dari Backend (M03: Async/Await) ---
         async function fetchOrganizations() {
             try {
                 const response = await fetch('/organizations');
                 const data = await response.json();
                 
                 const tableBody = document.getElementById('orgTableBody');
-                tableBody.innerHTML = ''; // Kosongkan isi tabel awal
-
+                tableBody.innerHTML = '';
                 if (data.length === 0) {
                     tableBody.innerHTML = '<tr><td colspan="4" style="text-align: center;">Belum ada organisasi yang terdaftar.</td></tr>';
                     return;
                 }
 
-                // Render data ke dalam baris tabel
                 data.forEach((org, index) => {
                     const row = `
                         <tr>
@@ -167,10 +161,8 @@
             }
         }
 
-        // Panggil fungsi saat halaman dimuat
         fetchOrganizations();
 
-        // --- 3. CREATE: Mengirim Data Baru ke Backend ---
         document.getElementById('orgForm').addEventListener('submit', async function(e) {
             e.preventDefault();
 
@@ -189,8 +181,8 @@
 
                 if (response.ok) {
                     alert('Organisasi berhasil didaftarkan!');
-                    document.getElementById('orgForm').reset(); // Kosongkan form
-                    fetchOrganizations(); // Muat ulang tabel tanpa perlu refresh halaman
+                    document.getElementById('orgForm').reset();
+                    fetchOrganizations();
                 } else {
                     alert('Gagal mendaftarkan organisasi.');
                 }

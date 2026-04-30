@@ -7,7 +7,7 @@ Attendee.init({
     id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
     student_name: { type: DataTypes.STRING, allowNull: false },
     nim: { type: DataTypes.STRING, allowNull: false },
-    eventId: { type: DataTypes.INTEGER, allowNull: false } // Referensi ke acara yang diikuti
+    eventId: { type: DataTypes.INTEGER, allowNull: false }
 }, {
     sequelize: db,
     modelName: 'Attendee',

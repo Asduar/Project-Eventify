@@ -18,11 +18,11 @@ Event.init({
         allowNull: true
     },
     date: {
-        type: DataTypes.DATEONLY, // Hanya menyimpan tanggal (YYYY-MM-DD)
+        type: DataTypes.DATEONLY,
         allowNull: false
     },
     time: {
-        type: DataTypes.TIME, // Menyimpan jam (HH:MM:SS)
+        type: DataTypes.TIME,
         allowNull: false
     },
     location: {

@@ -98,9 +98,8 @@
     </div>
 
     <script>
-        let isLoginMode = true; // Status penanda kita sedang di form mana
+        let isLoginMode = true; 
 
-        // Logika Toggle (Ganti antara Login dan Register)
         document.getElementById('toggleLink').addEventListener('click', () => {
             isLoginMode = !isLoginMode;
             document.getElementById('formTitle').innerText = isLoginMode ? 'Login Eventify' : 'Daftar Eventify';
@@ -110,11 +109,9 @@
                 ? 'Belum punya akun? <a id="toggleLink">Daftar sekarang</a>' 
                 : 'Sudah punya akun? <a id="toggleLink">Login di sini</a>';
             
-            // Pasang ulang event listener untuk tautan yang baru dirender
             document.getElementById('toggleLink').addEventListener('click', arguments.callee);
         });
 
-        // Logika Submit Form
         document.getElementById('authForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             
@@ -136,9 +133,7 @@
 
                 if (response.ok) {
                     alert(data.message);
-                    // Simpan data user ke localStorage browser
                     localStorage.setItem('eventify_user', JSON.stringify(data.user));
-                    // Arahkan ke halaman utama (kalender)
                     window.location.href = '/index.html'; 
                 } else {
                     alert(data.message);
