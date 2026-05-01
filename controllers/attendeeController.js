@@ -1,5 +1,6 @@
 import Attendee from '../models/Attendee.js';
 import Organization from '../models/Organization.js';
+import Event from '../models/Event.js';
 
 export const getAttendees = async (req, res) => {
     try {

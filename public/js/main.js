@@ -25,8 +25,9 @@ window.switchTab = function(sectionId) {
     };
     document.getElementById('pageTitle').innerText = titles[sectionId];
 
-    if (sectionId === 'dashboard' && calendarInstance) {
-        setTimeout(() => calendarInstance.updateSize(), 100);
+    if (sectionId === 'dashboard') {
+        if (calendarInstance) setTimeout(() => calendarInstance.updateSize(), 100);
+        loadDropdowns();
     }
     
     if (sectionId === 'organization') fetchOrganizations();
@@ -55,29 +56,22 @@ async function fetchEvents() {
     try {
         const res = await fetch('/events');
         const data = await res.json();
-        window.allEventsData = data.map(ev => ({
-            id: ev.id, title: ev.title, start: `${ev.date}T${ev.time}`,
-            extendedProps: { 
-                description: ev.description, type: ev.type, organizationId: ev.organizationId, roomId: ev.roomId,
-                orgName: ev.Organization ? ev.Organization.name : '-',
-                roomName: ev.Room ? `${ev.Room.room_name} - ${ev.Room.building}` : '-'
-            },
-            color: ev.type === 'Rapat' ? '#ff9f89' : '#3498db'
-        }));
-        
-        return window.allEventsData;
-        return data.map(ev => ({
-            id: ev.id, title: ev.title, start: `${ev.date}T${ev.time}`,
-            extendedProps: { 
-                description: ev.description, 
-                type: ev.type,
-                organizationId: ev.organizationId,
-                roomId: ev.roomId,
-                orgName: ev.Organization ? ev.Organization.name : '-',
-                roomName: ev.Room ? `${ev.Room.room_name} - ${ev.Room.building}` : '-'
-            },
-            color: ev.type === 'Rapat' ? '#ff9f89' : '#3498db'
-        }));
+        return data.map(ev => {
+            let eventColor = '';
+            if (ev.type === 'Rapat') eventColor = '#00D2D3';        
+            else if (ev.type === 'Konser') eventColor = '#FF007F';  
+            else eventColor = '#A2DE08';                           
+
+            return {
+                id: ev.id, title: ev.title, start: `${ev.date}T${ev.time}`,
+                extendedProps: { 
+                    description: ev.description, type: ev.type, organizationId: ev.organizationId, roomId: ev.roomId,
+                    orgName: ev.Organization ? ev.Organization.name : '-',
+                    roomName: ev.Room ? `${ev.Room.room_name} - ${ev.Room.building}` : '-'
+                },
+                color: eventColor 
+            };
+        });
     } catch (e) { return []; }
 }
 
@@ -187,8 +181,8 @@ async function fetchOrganizations() {
                     <td>${org.contact_email}</td>
                     <td>${org.description || '-'}</td>
                     <td>
-                        <button onclick="editOrg(${org.id}, '${org.name}', '${org.contact_email}', '${org.description || ''}')" style="background:#f39c12; color:white; border:none; padding:5px 10px; border-radius:4px; cursor:pointer;">Edit</button>
-                        <button onclick="deleteOrg(${org.id})" style="background:#e74c3c; color:white; border:none; padding:5px 10px; border-radius:4px; cursor:pointer;">Hapus</button>
+                    <button onclick="editOrg(...)" style="background:#FDCB6E; color:#111; border:none; padding:5px 10px; border-radius:4px; cursor:pointer; font-weight:bold;">Edit</button>
+<button onclick="deleteOrg(...)" style="background:#FF007F; color:white; border:none; padding:5px 10px; border-radius:4px; cursor:pointer; font-weight:bold;">Hapus</button>    
                     </td>
                 </tr>`;
         });
