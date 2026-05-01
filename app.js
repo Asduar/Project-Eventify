@@ -24,11 +24,18 @@ app.use('/organizations', organizationRoutes);
 app.use('/rooms', roomRoutes);
 app.use('/attendees', attendeeRoutes);
 
+Organization.hasMany(Event, { foreignKey: 'organizationId' });
+Event.belongsTo(Organization, { foreignKey: 'organizationId' });
+Room.hasMany(Event, { foreignKey: 'roomId' });
+Event.belongsTo(Room, { foreignKey: 'roomId' });
+Event.hasMany(Attendee, { foreignKey: 'eventId' });
+Attendee.belongsTo(Event, { foreignKey: 'eventId' });
+
 const initializeApp = async () => {
     try {
         await db.authenticate();
         console.log('Koneksi ke MySQL Workbench berhasil!');
-        await db.sync({ force: true }); 
+        await db.sync({ alter: true }); 
         console.log('Tabel database berhasil disinkronisasi.');
 
         app.get('/', (req, res) => {

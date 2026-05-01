@@ -1,8 +1,16 @@
 import Event from '../models/Event.js';
+import Organization from '../models/Organization.js';
+
+import Room from '../models/Room.js';
 
 export const getAllEvents = async (req, res) => {
     try {
-        const events = await Event.findAll();
+        const events = await Event.findAll({
+            include: [
+                { model: Organization, attributes: ['name'] },
+                { model: Room, attributes: ['room_name', 'building'] }
+            ]
+        });
         res.json(events);
     } catch (error) {
         res.status(500).json({ message: error.message });

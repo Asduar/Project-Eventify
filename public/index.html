@@ -121,11 +121,28 @@
                     <div class="form-group" style="width: 25%;"><label>Tipe</label>
                         <select id="type" required><option value="Rapat">Rapat</option><option value="Konser">Konser</option><option value="Seminar">Seminar</option><option value="Lainnya">Lainnya</option></select>
                     </div>
-                    <div class="form-group" style="width: 100%;"><label>Lokasi</label><input type="text" id="location" required></div>
+                    
+                    <div class="form-group" style="width: 48%;">
+                        <label>Penyelenggara (Organisasi)</label>
+                        <select id="organizationId" required>
+                            <option value="">Memuat...</option>
+                        </select>
+                    </div>
+                    <div class="form-group" style="width: 48%;">
+                        <label>Lokasi Ruangan</label>
+                        <select id="roomId" required>
+                            <option value="">Memuat...</option>
+                        </select>
+                    </div>
+                    
                     <div class="form-group" style="width: 100%;"><label>Deskripsi</label><textarea id="description" rows="2"></textarea></div>
                     <button type="submit" class="btn-submit" style="width: 100%;">Simpan Jadwal</button>
                 </form>
             </div>
+            <div style="margin-bottom: 15px;">
+                <input type="text" id="searchEvent" onkeyup="searchCalendar()" placeholder="Cari judul acara, lokasi, atau nama organisasi..." style="width: 100%; padding: 10px; border-radius: 4px; border: 1px solid #ccc; font-size: 14px;">
+            </div>
+            <div id='calendar'></div>
             <div class="card"><div id='calendar'></div></div>
         </div>
 
@@ -139,17 +156,16 @@
                 <div class="form-group"><button type="submit" class="btn-submit" id="btnSubmitOrg">Tambah</button></div>
             </form>
             
+            
+            <h3>Daftar Organisasi</h3>
+            <div style="margin-bottom: 10px;">
+                <input type="text" id="searchOrg" onkeyup="searchTable('searchOrg', 'orgTableBody')" placeholder="Cari organisasi..." style="width: 100%; padding: 8px; border-radius: 4px; border: 1px solid #ccc;">
+            </div>
+            <table>
             <table>
                 <thead><tr><th>No</th><th>Nama</th><th>Email</th><th>Deskripsi</th><th>Aksi</th></tr></thead>
                 <tbody id="orgTableBody"><tr><td colspan="5" style="text-align: center;">Memuat...</td></tr></tbody>
             </table>
-            </div>
-            <div class="card">
-                <h3>Daftar Organisasi</h3>
-                <table>
-                    <thead><tr><th>No</th><th>Nama</th><th>Email</th><th>Deskripsi</th></tr></thead>
-                    <tbody id="orgTableBody"><tr><td colspan="4" style="text-align: center;">Memuat...</td></tr></tbody>
-                </table>
             </div>
         </div>
 
@@ -165,6 +181,10 @@
             </div>
             <div class="card">
                 <h3>Daftar Ruangan</h3>
+                <div style="margin-bottom: 10px;">
+                <input type="text" id="searchRoom" onkeyup="searchTable('searchRoom', 'roomTableBody')" placeholder="Cari nama ruangan atau gedung..." style="width: 100%; padding: 8px; border-radius: 4px; border: 1px solid #ccc;">
+            </div>
+            <table>
                 <table>
                     <thead><tr><th>No</th><th>Nama Ruangan</th><th>Gedung</th><th>Kapasitas</th><th>Aksi</th></tr></thead>
                     <tbody id="roomTableBody"><tr><td colspan="5" style="text-align: center;">Memuat...</td></tr></tbody>
@@ -176,16 +196,28 @@
             <div class="card">
                 <h3>Daftarkan Peserta Event</h3>
                 <form id="attendeeForm" style="display: flex; gap: 10px; align-items: flex-end;">
-                    <input type="hidden" id="attId"> <div class="form-group" style="flex: 2;"><label>Nama Mahasiswa</label><input type="text" id="attName" required></div>
+                    <input type="hidden" id="attId">
+                    <div class="form-group" style="flex: 2;"><label>Nama Mahasiswa</label><input type="text" id="attName" required></div>
                     <div class="form-group" style="flex: 1;"><label>NIM</label><input type="text" id="attNim" required></div>
-                    <div class="form-group" style="flex: 1;"><label>ID Acara</label><input type="number" id="attEventId" required></div>
+                    
+                    <div class="form-group" style="flex: 1;">
+                        <label>Pilih Acara</label>
+                        <select id="attEventId" required>
+                            <option value="">Memuat...</option>
+                        </select>
+                    </div>
+                    
                     <div class="form-group"><button type="submit" class="btn-submit" id="btnSubmitAtt">Daftar</button></div>
                 </form>
             </div>
             <div class="card">
                 <h3>Daftar Peserta</h3>
+                <div style="margin-bottom: 10px;">
+                <input type="text" id="searchAtt" onkeyup="searchTable('searchAtt', 'attendeeTableBody')" placeholder="Cari nama peserta, NIM, atau acara..." style="width: 100%; padding: 8px; border-radius: 4px; border: 1px solid #ccc;">
+            </div>
+            <table>
                 <table>
-                    <thead><tr><th>No</th><th>Nama</th><th>NIM</th><th>ID Acara</th><th>Aksi</th></tr></thead>
+                    <thead><tr><th>No</th><th>Nama</th><th>NIM</th><th>Nama Acara</th><th>Aksi</th></tr></thead>
                     <tbody id="attendeeTableBody"><tr><td colspan="5" style="text-align: center;">Memuat...</td></tr></tbody>
                 </table>
             </div>
@@ -218,9 +250,11 @@
     <div id="modalOverlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:999;"></div>
     <div id="eventModal" style="display:none; position:fixed; top:50%; left:50%; transform:translate(-50%, -50%); background:white; padding:25px; border-radius:8px; width:320px; z-index:1000;">
         <h2 id="modalTitle" style="margin-top:0;">Judul</h2>
-        <p><strong>🕒 Jam:</strong> <span id="modalTime"></span></p>
-        <p><strong>📍 Lokasi:</strong> <span id="modalLocation"></span></p>
-        <p><strong>📝 Detail:</strong> <span id="modalDescription"></span></p>
+        <p style="font-size: 14px;"><strong>Jam:</strong> <span id="modalTime"></span></p>
+        <p style="font-size: 14px;"><strong>Penyelenggara:</strong> <span id="modalOrg"></span></p>
+        <p style="font-size: 14px;"><strong>Lokasi:</strong> <span id="modalLocation"></span></p>
+        <p style="font-size: 14px;"><strong>Detail:</strong> <span id="modalDescription"></span></p>
+        
         <div style="display:flex; gap:10px; margin-top:20px;">
             <button id="btnEdit" style="background:#f39c12; color:white; border:none; padding:10px; border-radius:4px; flex:1; cursor:pointer;">Edit</button>
             <button id="btnDelete" style="background:#e74c3c; color:white; border:none; padding:10px; border-radius:4px; flex:1; cursor:pointer;">Hapus</button>

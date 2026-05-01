@@ -7,14 +7,14 @@ document.getElementById('btnLogout').addEventListener('click', () => {
     window.location.href = '/login.html';
 });
 
-let calendarInstance = null;
+let calendarInstance = null; 
 
 window.switchTab = function(sectionId) {
     document.querySelectorAll('.content-section').forEach(sec => sec.classList.remove('active'));
     document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
     
     document.getElementById(sectionId).classList.add('active');
-    event.currentTarget.classList.add('active');
+    event.currentTarget.classList.add('active'); 
 
     const titles = {
         'dashboard': 'Kalender Acara',
@@ -30,37 +30,93 @@ window.switchTab = function(sectionId) {
     }
     
     if (sectionId === 'organization') fetchOrganizations();
-    if (sectionId === 'room') fetchRooms();
-    if (sectionId === 'attendee') fetchAttendees();
-    if (sectionId === 'profile') loadProfileData();
+    if (sectionId === 'room') fetchRooms();         
+    if (sectionId === 'attendee') fetchAttendees(); 
+    if (sectionId === 'profile') loadProfileData(); 
 };
+
+async function loadDropdowns() {
+    try {
+        const [orgRes, roomRes] = await Promise.all([fetch('/organizations'), fetch('/rooms')]);
+        const orgs = await orgRes.json();
+        const rooms = await roomRes.json();
+
+        const orgSelect = document.getElementById('organizationId');
+        orgSelect.innerHTML = '<option value="">Pilih Organisasi</option>';
+        orgs.forEach(o => orgSelect.innerHTML += `<option value="${o.id}">${o.name}</option>`);
+
+        const roomSelect = document.getElementById('roomId');
+        roomSelect.innerHTML = '<option value="">Pilih Ruangan</option>';
+        rooms.forEach(r => roomSelect.innerHTML += `<option value="${r.id}">${r.room_name} (${r.building})</option>`);
+    } catch (e) { console.error("Gagal memuat dropdown", e); }
+}
 
 async function fetchEvents() {
     try {
         const res = await fetch('/events');
         const data = await res.json();
+        window.allEventsData = data.map(ev => ({
+            id: ev.id, title: ev.title, start: `${ev.date}T${ev.time}`,
+            extendedProps: { 
+                description: ev.description, type: ev.type, organizationId: ev.organizationId, roomId: ev.roomId,
+                orgName: ev.Organization ? ev.Organization.name : '-',
+                roomName: ev.Room ? `${ev.Room.room_name} - ${ev.Room.building}` : '-'
+            },
+            color: ev.type === 'Rapat' ? '#ff9f89' : '#3498db'
+        }));
+        
+        return window.allEventsData;
         return data.map(ev => ({
             id: ev.id, title: ev.title, start: `${ev.date}T${ev.time}`,
-            extendedProps: { description: ev.description, location: ev.location, type: ev.type },
+            extendedProps: { 
+                description: ev.description, 
+                type: ev.type,
+                organizationId: ev.organizationId,
+                roomId: ev.roomId,
+                orgName: ev.Organization ? ev.Organization.name : '-',
+                roomName: ev.Room ? `${ev.Room.room_name} - ${ev.Room.building}` : '-'
+            },
             color: ev.type === 'Rapat' ? '#ff9f89' : '#3498db'
         }));
     } catch (e) { return []; }
 }
 
+window.searchCalendar = function() {
+    if (!calendarInstance) return;
+    
+    const input = document.getElementById('searchEvent').value.toLowerCase();
+    
+    const filteredEvents = window.allEventsData.filter(ev => 
+        ev.title.toLowerCase().includes(input) || 
+        ev.extendedProps.orgName.toLowerCase().includes(input) || 
+        ev.extendedProps.roomName.toLowerCase().includes(input)
+    );
+    
+    calendarInstance.removeAllEventSources();
+    calendarInstance.addEventSource(filteredEvents);
+};
+
 document.addEventListener('DOMContentLoaded', async function() {
+    loadDropdowns(); 
+    
     const calendarEl = document.getElementById('calendar');
     calendarInstance = new FullCalendar.Calendar(calendarEl, {
         initialView: 'dayGridMonth',
         headerToolbar: { left: 'prev,next today', center: 'title', right: 'dayGridMonth,listMonth' },
+        buttonText: { prev: '<', next: '>' },
         events: await fetchEvents(),
         eventDisplay: 'block', displayEventTime: true,
         eventTimeFormat: { hour: '2-digit', minute: '2-digit', hour12: false },
         
         eventClick: function(info) {
+            const props = info.event.extendedProps;
             document.getElementById('modalTitle').innerText = info.event.title;
             document.getElementById('modalTime').innerText = info.event.start.toLocaleTimeString('id-ID', {hour: '2-digit', minute:'2-digit'});
-            document.getElementById('modalLocation').innerText = info.event.extendedProps.location;
-            document.getElementById('modalDescription').innerText = info.event.extendedProps.description;
+            
+            document.getElementById('modalOrg').innerText = props.orgName;
+            document.getElementById('modalLocation').innerText = props.roomName;
+            document.getElementById('modalDescription').innerText = props.description || '-';
+            
             document.getElementById('btnDelete').dataset.id = info.event.id;
             window.currentSelectedEvent = info.event; 
             document.getElementById('modalOverlay').style.display = 'block';
@@ -88,9 +144,12 @@ document.getElementById('btnEdit').addEventListener('click', function() {
     document.getElementById('title').value = evt.title;
     document.getElementById('date').value = evt.start.toISOString().split('T')[0];
     document.getElementById('time').value = evt.start.toTimeString().split(' ')[0];
-    document.getElementById('location').value = evt.extendedProps.location;
     document.getElementById('type').value = evt.extendedProps.type;
     document.getElementById('description').value = evt.extendedProps.description || '';
+    
+    document.getElementById('organizationId').value = evt.extendedProps.organizationId;
+    document.getElementById('roomId').value = evt.extendedProps.roomId;
+    
     document.querySelector('#addEventForm button').innerText = 'Simpan Perubahan';
 });
 
@@ -98,16 +157,19 @@ document.getElementById('addEventForm').addEventListener('submit', async functio
     e.preventDefault();
     const id = document.getElementById('eventId').value;
     const payload = {
-        title: document.getElementById('title').value, date: document.getElementById('date').value,
-        time: document.getElementById('time').value, location: document.getElementById('location').value,
-        type: document.getElementById('type').value, description: document.getElementById('description').value
+        title: document.getElementById('title').value, 
+        date: document.getElementById('date').value,
+        time: document.getElementById('time').value, 
+        type: document.getElementById('type').value, 
+        description: document.getElementById('description').value,
+        organizationId: document.getElementById('organizationId').value,
+        roomId: document.getElementById('roomId').value
     };
     await fetch(id ? `/events/${id}` : '/events', {
         method: id ? 'PUT' : 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload)
     });
     window.location.reload();
 });
-
 
 async function fetchOrganizations() {
     try {
@@ -238,6 +300,12 @@ document.getElementById('roomForm').addEventListener('submit', async function(e)
 
 async function fetchAttendees() {
     try {
+        const evRes = await fetch('/events');
+        const events = await evRes.json();
+        const evSelect = document.getElementById('attEventId');
+        evSelect.innerHTML = '<option value="">Pilih Acara</option>';
+        events.forEach(ev => evSelect.innerHTML += `<option value="${ev.id}">${ev.title}</option>`);
+
         const res = await fetch('/attendees');
         const data = await res.json();
         const tbody = document.getElementById('attendeeTableBody');
@@ -245,12 +313,14 @@ async function fetchAttendees() {
         if(data.length === 0) return tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;">Belum ada peserta.</td></tr>';
         
         data.forEach((att, i) => {
+            const eventName = att.Event ? att.Event.title : 'Acara telah dihapus';
+            
             tbody.innerHTML += `
                 <tr>
                     <td>${i+1}</td>
                     <td><strong>${att.student_name}</strong></td>
                     <td>${att.nim}</td>
-                    <td>ID Event: ${att.eventId}</td>
+                    <td>${eventName}</td>
                     <td>
                         <button onclick="editAttendee(${att.id}, '${att.student_name}', '${att.nim}', ${att.eventId})" style="background:#f39c12; color:white; border:none; padding:5px 10px; border-radius:4px; cursor:pointer;">Edit</button>
                         <button onclick="deleteAttendee(${att.id})" style="background:#e74c3c; color:white; border:none; padding:5px 10px; border-radius:4px; cursor:pointer;">Hapus</button>
@@ -333,7 +403,6 @@ document.getElementById('profileForm').addEventListener('submit', async function
             localStorage.setItem('eventify_user', JSON.stringify(currentUser));
             
             document.getElementById('displayUsername').innerText = payload.username;
-            
             document.getElementById('profPassword').value = ''; 
         } else {
             const errorData = await response.json();
@@ -344,3 +413,18 @@ document.getElementById('profileForm').addEventListener('submit', async function
         alert('Terjadi kesalahan pada server.');
     }
 });
+window.searchTable = function(inputId, tableBodyId) {
+    const input = document.getElementById(inputId).value.toLowerCase();
+    const rows = document.getElementById(tableBodyId).getElementsByTagName('tr');
+
+    for (let i = 0; i < rows.length; i++) {
+        if (rows[i].cells.length <= 1) continue;
+
+        const rowText = rows[i].innerText.toLowerCase();
+        if (rowText.includes(input)) {
+            rows[i].style.display = '';
+        } else {
+            rows[i].style.display = 'none';
+        }
+    }
+};

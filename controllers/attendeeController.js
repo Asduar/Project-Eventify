@@ -1,10 +1,15 @@
 import Attendee from '../models/Attendee.js';
+import Organization from '../models/Organization.js';
 
 export const getAttendees = async (req, res) => {
     try {
-        const data = await Attendee.findAll();
-        res.json(data);
-    } catch (error) { res.status(500).json({ message: error.message }); }
+        const attendees = await Attendee.findAll({
+            include: [{ model: Event, attributes: ['title'] }]
+        });
+        res.json(attendees);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
 };
 
 export const createAttendee = async (req, res) => {
