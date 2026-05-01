@@ -181,8 +181,8 @@ async function fetchOrganizations() {
                     <td>${org.contact_email}</td>
                     <td>${org.description || '-'}</td>
                     <td>
-                    <button onclick="editOrg(...)" style="background:#FDCB6E; color:#111; border:none; padding:5px 10px; border-radius:4px; cursor:pointer; font-weight:bold;">Edit</button>
-<button onclick="deleteOrg(...)" style="background:#FF007F; color:white; border:none; padding:5px 10px; border-radius:4px; cursor:pointer; font-weight:bold;">Hapus</button>    
+                        <button onclick="editOrg(${org.id}, '${org.name}', '${org.contact_email}', '${org.description || ''}')" style="background:#FDCB6E; color:#111; border:none; padding:5px 10px; border-radius:4px; cursor:pointer; font-weight:bold;">Edit</button>
+                        <button onclick="deleteOrg(${org.id})" style="background:#FF007F; color:white; border:none; padding:5px 10px; border-radius:4px; cursor:pointer; font-weight:bold;">Hapus</button>
                     </td>
                 </tr>`;
         });
@@ -249,8 +249,8 @@ async function fetchRooms() {
                     <td>${room.building}</td>
                     <td>${room.capacity} Orang</td>
                     <td>
-                        <button onclick="editRoom(${room.id}, '${room.room_name}', '${room.building}', ${room.capacity})" style="background:#f39c12; color:white; border:none; padding:5px 10px; border-radius:4px; cursor:pointer;">Edit</button>
-                        <button onclick="deleteRoom(${room.id})" style="background:#e74c3c; color:white; border:none; padding:5px 10px; border-radius:4px; cursor:pointer;">Hapus</button>
+                        <button onclick="editRoom(${room.id}, '${room.room_name}', '${room.building}', ${room.capacity})" style="background:#FDCB6E; color:#111; border:none; padding:5px 10px; border-radius:4px; cursor:pointer; font-weight:bold;">Edit</button>
+                        <button onclick="deleteRoom(${room.id})" style="background:#FF007F; color:white; border:none; padding:5px 10px; border-radius:4px; cursor:pointer; font-weight:bold;">Hapus</button>
                     </td>
                 </tr>`;
         });
@@ -297,7 +297,7 @@ async function fetchAttendees() {
         const evRes = await fetch('/events');
         const events = await evRes.json();
         const evSelect = document.getElementById('attEventId');
-        evSelect.innerHTML = '<option value="">Pilih Acara</option>';
+        evSelect.innerHTML = '<option value="">-- Pilih Acara --</option>';
         events.forEach(ev => evSelect.innerHTML += `<option value="${ev.id}">${ev.title}</option>`);
 
         const res = await fetch('/attendees');
@@ -308,7 +308,6 @@ async function fetchAttendees() {
         
         data.forEach((att, i) => {
             const eventName = att.Event ? att.Event.title : 'Acara telah dihapus';
-            
             tbody.innerHTML += `
                 <tr>
                     <td>${i+1}</td>
@@ -316,8 +315,8 @@ async function fetchAttendees() {
                     <td>${att.nim}</td>
                     <td>${eventName}</td>
                     <td>
-                        <button onclick="editAttendee(${att.id}, '${att.student_name}', '${att.nim}', ${att.eventId})" style="background:#f39c12; color:white; border:none; padding:5px 10px; border-radius:4px; cursor:pointer;">Edit</button>
-                        <button onclick="deleteAttendee(${att.id})" style="background:#e74c3c; color:white; border:none; padding:5px 10px; border-radius:4px; cursor:pointer;">Hapus</button>
+                        <button onclick="editAttendee(${att.id}, '${att.student_name}', '${att.nim}', ${att.eventId})" style="background:#FDCB6E; color:#111; border:none; padding:5px 10px; border-radius:4px; cursor:pointer; font-weight:bold;">Edit</button>
+                        <button onclick="deleteAttendee(${att.id})" style="background:#FF007F; color:white; border:none; padding:5px 10px; border-radius:4px; cursor:pointer; font-weight:bold;">Hapus</button>
                     </td>
                 </tr>`;
         });
