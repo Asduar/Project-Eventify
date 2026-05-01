@@ -133,11 +133,16 @@
             <div class="card">
                 <h3>Tambah Organisasi</h3>
                 <form id="orgForm" style="display: flex; gap: 10px; align-items: flex-end;">
-                    <div class="form-group" style="flex: 1;"><label>Nama</label><input type="text" id="orgName" required></div>
-                    <div class="form-group" style="flex: 1;"><label>Email Kontak</label><input type="email" id="orgEmail" required></div>
-                    <div class="form-group" style="flex: 2;"><label>Deskripsi</label><input type="text" id="orgDesc"></div>
-                    <div class="form-group"><button type="submit" class="btn-submit">Tambah</button></div>
-                </form>
+                <input type="hidden" id="orgId"> <div class="form-group" style="flex: 1;"><label>Nama</label><input type="text" id="orgName" required></div>
+                <div class="form-group" style="flex: 1;"><label>Email Kontak</label><input type="email" id="orgEmail" required></div>
+                <div class="form-group" style="flex: 2;"><label>Deskripsi</label><input type="text" id="orgDesc"></div>
+                <div class="form-group"><button type="submit" class="btn-submit" id="btnSubmitOrg">Tambah</button></div>
+            </form>
+            
+            <table>
+                <thead><tr><th>No</th><th>Nama</th><th>Email</th><th>Deskripsi</th><th>Aksi</th></tr></thead>
+                <tbody id="orgTableBody"><tr><td colspan="5" style="text-align: center;">Memuat...</td></tr></tbody>
+            </table>
             </div>
             <div class="card">
                 <h3>Daftar Organisasi</h3>
@@ -150,19 +155,19 @@
 
         <div id="room" class="content-section">
             <div class="card">
-                <h3>Tambah Ruangan Baru</h3>
+                <h3>Manajemen Ruangan</h3>
                 <form id="roomForm" style="display: flex; gap: 10px; align-items: flex-end;">
-                    <div class="form-group" style="flex: 2;"><label>Nama Ruangan</label><input type="text" id="roomName" required placeholder="Contoh: Aula lt.5"></div>
+                    <input type="hidden" id="roomId"> <div class="form-group" style="flex: 2;"><label>Nama Ruangan</label><input type="text" id="roomName" required placeholder="Contoh: Aula lt.5"></div>
                     <div class="form-group" style="flex: 1;"><label>Gedung</label><input type="text" id="roomBuilding" required placeholder="Contoh: Gedung B"></div>
                     <div class="form-group" style="flex: 1;"><label>Kapasitas (Orang)</label><input type="number" id="roomCapacity" required></div>
-                    <div class="form-group"><button type="submit" class="btn-submit">Tambah</button></div>
+                    <div class="form-group"><button type="submit" class="btn-submit" id="btnSubmitRoom">Tambah</button></div>
                 </form>
             </div>
             <div class="card">
                 <h3>Daftar Ruangan</h3>
                 <table>
-                    <thead><tr><th>No</th><th>Nama Ruangan</th><th>Gedung</th><th>Kapasitas</th></tr></thead>
-                    <tbody id="roomTableBody"><tr><td colspan="4" style="text-align: center;">Memuat...</td></tr></tbody>
+                    <thead><tr><th>No</th><th>Nama Ruangan</th><th>Gedung</th><th>Kapasitas</th><th>Aksi</th></tr></thead>
+                    <tbody id="roomTableBody"><tr><td colspan="5" style="text-align: center;">Memuat...</td></tr></tbody>
                 </table>
             </div>
         </div>
@@ -171,17 +176,17 @@
             <div class="card">
                 <h3>Daftarkan Peserta Event</h3>
                 <form id="attendeeForm" style="display: flex; gap: 10px; align-items: flex-end;">
-                    <div class="form-group" style="flex: 2;"><label>Nama Mahasiswa</label><input type="text" id="attName" required></div>
+                    <input type="hidden" id="attId"> <div class="form-group" style="flex: 2;"><label>Nama Mahasiswa</label><input type="text" id="attName" required></div>
                     <div class="form-group" style="flex: 1;"><label>NIM</label><input type="text" id="attNim" required></div>
-                    <div class="form-group" style="flex: 1;"><label>ID Acara (Event)</label><input type="number" id="attEventId" required placeholder="Contoh: 1"></div>
-                    <div class="form-group"><button type="submit" class="btn-submit">Daftar</button></div>
+                    <div class="form-group" style="flex: 1;"><label>ID Acara</label><input type="number" id="attEventId" required></div>
+                    <div class="form-group"><button type="submit" class="btn-submit" id="btnSubmitAtt">Daftar</button></div>
                 </form>
             </div>
             <div class="card">
                 <h3>Daftar Peserta</h3>
                 <table>
-                    <thead><tr><th>No</th><th>Nama</th><th>NIM</th><th>ID Acara</th></tr></thead>
-                    <tbody id="attendeeTableBody"><tr><td colspan="4" style="text-align: center;">Memuat...</td></tr></tbody>
+                    <thead><tr><th>No</th><th>Nama</th><th>NIM</th><th>ID Acara</th><th>Aksi</th></tr></thead>
+                    <tbody id="attendeeTableBody"><tr><td colspan="5" style="text-align: center;">Memuat...</td></tr></tbody>
                 </table>
             </div>
         </div>

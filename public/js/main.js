@@ -115,25 +115,65 @@ async function fetchOrganizations() {
         const data = await res.json();
         const tbody = document.getElementById('orgTableBody');
         tbody.innerHTML = '';
-        if(data.length === 0) return tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;">Kosong</td></tr>';
+        if(data.length === 0) return tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;">Kosong</td></tr>';
         
         data.forEach((org, i) => {
-            tbody.innerHTML += `<tr><td>${i+1}</td><td><strong>${org.name}</strong></td><td>${org.contact_email}</td><td>${org.description || '-'}</td></tr>`;
+            tbody.innerHTML += `
+                <tr>
+                    <td>${i+1}</td>
+                    <td><strong>${org.name}</strong></td>
+                    <td>${org.contact_email}</td>
+                    <td>${org.description || '-'}</td>
+                    <td>
+                        <button onclick="editOrg(${org.id}, '${org.name}', '${org.contact_email}', '${org.description || ''}')" style="background:#f39c12; color:white; border:none; padding:5px 10px; border-radius:4px; cursor:pointer;">Edit</button>
+                        <button onclick="deleteOrg(${org.id})" style="background:#e74c3c; color:white; border:none; padding:5px 10px; border-radius:4px; cursor:pointer;">Hapus</button>
+                    </td>
+                </tr>`;
         });
     } catch (e) { console.error(e); }
 }
 
+window.deleteOrg = async function(id) {
+    if (confirm('Yakin ingin menghapus organisasi ini?')) {
+        await fetch(`/organizations/${id}`, { method: 'DELETE' });
+        fetchOrganizations();
+    }
+};
+
+window.editOrg = function(id, name, email, desc) {
+    document.getElementById('orgId').value = id;
+    document.getElementById('orgName').value = name;
+    document.getElementById('orgEmail').value = email;
+    document.getElementById('orgDesc').value = desc;
+    
+    const btn = document.getElementById('btnSubmitOrg');
+    btn.innerText = 'Simpan';
+    btn.style.backgroundColor = '#f39c12';
+};
+
 document.getElementById('orgForm').addEventListener('submit', async function(e) {
     e.preventDefault();
+    
+    const id = document.getElementById('orgId').value;
     const payload = {
         name: document.getElementById('orgName').value,
         contact_email: document.getElementById('orgEmail').value,
         description: document.getElementById('orgDesc').value
     };
-    await fetch('/organizations', {
-        method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload)
+    
+    const url = id ? `/organizations/${id}` : '/organizations';
+    const method = id ? 'PUT' : 'POST';
+
+    await fetch(url, {
+        method: method, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload)
     });
+    
     document.getElementById('orgForm').reset();
+    document.getElementById('orgId').value = '';
+    const btn = document.getElementById('btnSubmitOrg');
+    btn.innerText = 'Tambah';
+    btn.style.backgroundColor = '#3498db';
+    
     fetchOrganizations();
 });
 
@@ -143,25 +183,56 @@ async function fetchRooms() {
         const data = await res.json();
         const tbody = document.getElementById('roomTableBody');
         tbody.innerHTML = '';
-        if(data.length === 0) return tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;">Belum ada ruangan.</td></tr>';
+        if(data.length === 0) return tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;">Belum ada ruangan.</td></tr>';
         
         data.forEach((room, i) => {
-            tbody.innerHTML += `<tr><td>${i+1}</td><td><strong>${room.room_name}</strong></td><td>${room.building}</td><td>${room.capacity} Orang</td></tr>`;
+            tbody.innerHTML += `
+                <tr>
+                    <td>${i+1}</td>
+                    <td><strong>${room.room_name}</strong></td>
+                    <td>${room.building}</td>
+                    <td>${room.capacity} Orang</td>
+                    <td>
+                        <button onclick="editRoom(${room.id}, '${room.room_name}', '${room.building}', ${room.capacity})" style="background:#f39c12; color:white; border:none; padding:5px 10px; border-radius:4px; cursor:pointer;">Edit</button>
+                        <button onclick="deleteRoom(${room.id})" style="background:#e74c3c; color:white; border:none; padding:5px 10px; border-radius:4px; cursor:pointer;">Hapus</button>
+                    </td>
+                </tr>`;
         });
     } catch (e) { console.error(e); }
 }
 
+window.deleteRoom = async function(id) {
+    if (confirm('Hapus ruangan ini?')) {
+        await fetch(`/rooms/${id}`, { method: 'DELETE' });
+        fetchRooms();
+    }
+};
+
+window.editRoom = function(id, name, building, capacity) {
+    document.getElementById('roomId').value = id;
+    document.getElementById('roomName').value = name;
+    document.getElementById('roomBuilding').value = building;
+    document.getElementById('roomCapacity').value = capacity;
+    
+    const btn = document.getElementById('btnSubmitRoom');
+    btn.innerText = 'Simpan'; btn.style.backgroundColor = '#f39c12';
+};
+
 document.getElementById('roomForm').addEventListener('submit', async function(e) {
     e.preventDefault();
+    const id = document.getElementById('roomId').value;
     const payload = {
         room_name: document.getElementById('roomName').value,
         building: document.getElementById('roomBuilding').value,
         capacity: document.getElementById('roomCapacity').value
     };
-    await fetch('/rooms', {
-        method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload)
+    await fetch(id ? `/rooms/${id}` : '/rooms', {
+        method: id ? 'PUT' : 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload)
     });
-    document.getElementById('roomForm').reset();
+    
+    document.getElementById('roomForm').reset(); document.getElementById('roomId').value = '';
+    const btn = document.getElementById('btnSubmitRoom');
+    btn.innerText = 'Tambah'; btn.style.backgroundColor = '#3498db';
     fetchRooms();
 });
 
@@ -171,25 +242,56 @@ async function fetchAttendees() {
         const data = await res.json();
         const tbody = document.getElementById('attendeeTableBody');
         tbody.innerHTML = '';
-        if(data.length === 0) return tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;">Belum ada peserta terdaftar.</td></tr>';
+        if(data.length === 0) return tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;">Belum ada peserta.</td></tr>';
         
         data.forEach((att, i) => {
-            tbody.innerHTML += `<tr><td>${i+1}</td><td><strong>${att.student_name}</strong></td><td>${att.nim}</td><td>ID Event: ${att.eventId}</td></tr>`;
+            tbody.innerHTML += `
+                <tr>
+                    <td>${i+1}</td>
+                    <td><strong>${att.student_name}</strong></td>
+                    <td>${att.nim}</td>
+                    <td>ID Event: ${att.eventId}</td>
+                    <td>
+                        <button onclick="editAttendee(${att.id}, '${att.student_name}', '${att.nim}', ${att.eventId})" style="background:#f39c12; color:white; border:none; padding:5px 10px; border-radius:4px; cursor:pointer;">Edit</button>
+                        <button onclick="deleteAttendee(${att.id})" style="background:#e74c3c; color:white; border:none; padding:5px 10px; border-radius:4px; cursor:pointer;">Hapus</button>
+                    </td>
+                </tr>`;
         });
     } catch (e) { console.error(e); }
 }
 
+window.deleteAttendee = async function(id) {
+    if (confirm('Hapus peserta ini?')) {
+        await fetch(`/attendees/${id}`, { method: 'DELETE' });
+        fetchAttendees();
+    }
+};
+
+window.editAttendee = function(id, name, nim, eventId) {
+    document.getElementById('attId').value = id;
+    document.getElementById('attName').value = name;
+    document.getElementById('attNim').value = nim;
+    document.getElementById('attEventId').value = eventId;
+    
+    const btn = document.getElementById('btnSubmitAtt');
+    btn.innerText = 'Simpan'; btn.style.backgroundColor = '#f39c12';
+};
+
 document.getElementById('attendeeForm').addEventListener('submit', async function(e) {
     e.preventDefault();
+    const id = document.getElementById('attId').value;
     const payload = {
         student_name: document.getElementById('attName').value,
         nim: document.getElementById('attNim').value,
         eventId: document.getElementById('attEventId').value
     };
-    await fetch('/attendees', {
-        method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload)
+    await fetch(id ? `/attendees/${id}` : '/attendees', {
+        method: id ? 'PUT' : 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload)
     });
-    document.getElementById('attendeeForm').reset();
+    
+    document.getElementById('attendeeForm').reset(); document.getElementById('attId').value = '';
+    const btn = document.getElementById('btnSubmitAtt');
+    btn.innerText = 'Daftar'; btn.style.backgroundColor = '#3498db';
     fetchAttendees();
 });
 
